@@ -5,7 +5,7 @@ declare class ConsolWeb {
     constructor(config?: ConsolWebConf);
     private bind_native;
     render(): void;
-    private initialize;
+    clear(): void;
     pushLine(callback: LineData["callback"], below: boolean, ...data: LineData["data"]): number;
     replaceLine(index: number, callback: LineData["callback"], below: boolean, ...data: LineData["data"]): number;
     removeLine(index: number, below: boolean): number;

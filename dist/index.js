@@ -25,7 +25,7 @@ class ConsolWeb {
         if (config.setGlobalThis) {
             window.consolweb = this;
         }
-        this.initialize();
+        this.clear();
     }
     bind_native() {
         const oldConsole = window.console;
@@ -51,7 +51,7 @@ class ConsolWeb {
             lineData.callback(...lineData.data);
         });
     }
-    initialize() {
+    clear() {
         this.lines = [];
         this.render();
     }
