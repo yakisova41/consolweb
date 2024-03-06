@@ -53,6 +53,7 @@ class ConsolWeb {
     }
     clear() {
         this.lines = [];
+        this.belowLines = [];
         this.render();
     }
     pushLine(callback, below, ...data) {
