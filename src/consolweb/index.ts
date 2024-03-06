@@ -45,6 +45,7 @@ export class ConsolWeb {
 
   public clear() {
     this.lines = [];
+    this.belowLines = [];
     this.render();
   }
 
