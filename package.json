@@ -1,0 +1,29 @@
+{
+  "name": "consolweb",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist",
+  "types": "dist",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build:demopage": "tsc && vite build",
+    "preview:demopage": "vite preview",
+    "build": "bun x rollup -c"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.2",
+    "@rollup/plugin-typescript": "^11.1.2",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5",
+    "rollup": "^3.25.3",
+    "rollup-plugin-dts": "^6.1.0",
+    "tslib": "^2.6.2",
+    "typescript": "^5.2.2",
+    "vite": "^5.1.4"
+  }
+}
