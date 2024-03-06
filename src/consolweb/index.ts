@@ -14,7 +14,7 @@ export class ConsolWeb {
       window.consolweb = this;
     }
 
-    this.initialize();
+    this.clear();
   }
 
   private bind_native() {
@@ -43,7 +43,7 @@ export class ConsolWeb {
     });
   }
 
-  private initialize() {
+  public clear() {
     this.lines = [];
     this.render();
   }
