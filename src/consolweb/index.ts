@@ -1,7 +1,6 @@
 export class ConsolWeb {
   private console: typeof window.console;
   private lines: LineData[] = [];
-  private belowLines: LineData[] = [];
 
   constructor(config: ConsolWebConf = {}) {
     this.console = window.console;
@@ -38,23 +37,15 @@ export class ConsolWeb {
     this.lines.forEach((lineData) => {
       lineData.callback(...lineData.data);
     });
-    this.belowLines.forEach((lineData) => {
-      lineData.callback(...lineData.data);
-    });
   }
 
   public clear() {
     this.lines = [];
-    this.belowLines = [];
     this.render();
   }
 
-  public pushLine(
-    callback: LineData["callback"],
-    below: boolean,
-    ...data: LineData["data"]
-  ) {
-    (below ? this.belowLines : this.lines).push({
+  public pushLine(callback: LineData["callback"], ...data: LineData["data"]) {
+    this.lines.push({
       callback,
       data,
     });
@@ -65,10 +56,9 @@ export class ConsolWeb {
   public replaceLine(
     index: number,
     callback: LineData["callback"],
-    below: boolean,
     ...data: LineData["data"]
   ) {
-    (below ? this.belowLines : this.lines).splice(index, 1, {
+    this.lines.splice(index, 1, {
       callback,
       data,
     });
@@ -76,50 +66,50 @@ export class ConsolWeb {
     return index;
   }
 
-  public removeLine(index: number, below: boolean) {
-    (below ? this.belowLines : this.lines).splice(index, 1);
+  public removeLine(index: number) {
+    this.lines.splice(index, 1);
 
     return index;
   }
 
   public log(...data: LineData["data"]) {
-    const index = this.pushLine(this.console.log, false, ...data);
+    const index = this.pushLine(this.console.log, ...data);
     this.render();
 
     return {
       clear: () => {
-        this.removeLine(index, false);
+        this.removeLine(index);
       },
       replace: (...data: LineData["data"]) => {
-        this.replaceLine(index, this.console.log, false, ...data);
+        this.replaceLine(index, this.console.log, ...data);
       },
     };
   }
 
   public warn(...data: LineData["data"]) {
-    const index = this.pushLine(this.console.warn, false, ...data);
+    const index = this.pushLine(this.console.warn, ...data);
     this.render();
 
     return {
       clear: () => {
-        this.removeLine(index, false);
+        this.removeLine(index);
       },
       replace: (...data: LineData["data"]) => {
-        this.replaceLine(index, this.console.warn, false, ...data);
+        this.replaceLine(index, this.console.warn, ...data);
       },
     };
   }
 
   public error(...data: LineData["data"]) {
-    const index = this.pushLine(this.console.error, false, ...data);
+    const index = this.pushLine(this.console.error, ...data);
     this.render();
 
     return {
       clear: () => {
-        this.removeLine(index, false);
+        this.removeLine(index);
       },
       replace: (...data: LineData["data"]) => {
-        this.replaceLine(index, this.console.error, false, ...data);
+        this.replaceLine(index, this.console.error, ...data);
       },
     };
   }
@@ -135,7 +125,6 @@ export class ConsolWeb {
       beforeText?: string;
       afterText?: string;
       loop?: boolean;
-      alwaysBelow?: boolean;
     },
   ) {
     let output = "";
@@ -144,8 +133,6 @@ export class ConsolWeb {
     const backgroundBar =
       conf.backgroundBar !== undefined ? conf.backgroundBar : "_";
     const currentBar = conf.currentBar !== undefined ? conf.currentBar : "#";
-
-    const below = conf.alwaysBelow ? true : false;
 
     const createBar = (current: number, max: number) => {
       const barLength = 20;
@@ -167,19 +154,14 @@ export class ConsolWeb {
     };
 
     output = createBar(current, max);
-    const index = this.pushLine(this.console.log, below, output);
+    const index = this.pushLine(this.console.log, output);
     this.render();
 
     if (conf.loop) {
       const frames = ["-", "\\", "|", "/"];
       let i = 0;
       loopInterval = window.setInterval(() => {
-        this.replaceLine(
-          index,
-          this.console.log,
-          below,
-          frames[i] + " " + output,
-        );
+        this.replaceLine(index, this.console.log, frames[i] + " " + output);
 
         if (i !== 3) {
           i++;
@@ -194,7 +176,7 @@ export class ConsolWeb {
     return {
       update: (updateCurrent: number) => {
         output = createBar(updateCurrent, max);
-        this.replaceLine(index, this.console.log, below, output);
+        this.replaceLine(index, this.console.log, output);
         if (!conf.loop) {
           this.render();
         }
@@ -203,7 +185,7 @@ export class ConsolWeb {
         if (loopInterval !== null) {
           clearInterval(loopInterval);
         }
-        this.removeLine(index, below);
+        this.removeLine(index);
       },
     };
   }
