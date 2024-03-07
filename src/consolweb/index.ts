@@ -79,6 +79,7 @@ export class ConsolWeb {
     return {
       clear: () => {
         this.removeLine(index);
+        this.render();
       },
       replace: (...data: LineData["data"]) => {
         this.replaceLine(index, this.console.log, ...data);
@@ -93,6 +94,7 @@ export class ConsolWeb {
     return {
       clear: () => {
         this.removeLine(index);
+        this.render();
       },
       replace: (...data: LineData["data"]) => {
         this.replaceLine(index, this.console.warn, ...data);
@@ -107,6 +109,7 @@ export class ConsolWeb {
     return {
       clear: () => {
         this.removeLine(index);
+        this.render();
       },
       replace: (...data: LineData["data"]) => {
         this.replaceLine(index, this.console.error, ...data);
@@ -153,11 +156,7 @@ export class ConsolWeb {
       return `${beforeText}${length}${percent}${bar} ${afterText}`;
     };
 
-    output = createBar(current, max);
-    const index = this.pushLine(this.console.log, output);
-    this.render();
-
-    if (conf.loop) {
+    const createLoop = () => {
       const frames = ["-", "\\", "|", "/"];
       let i = 0;
       loopInterval = window.setInterval(() => {
@@ -171,6 +170,14 @@ export class ConsolWeb {
 
         this.render();
       }, 200);
+    };
+
+    output = createBar(current, max);
+    const index = this.pushLine(this.console.log, output);
+    this.render();
+
+    if (conf.loop) {
+      createLoop();
     }
 
     return {
@@ -184,8 +191,21 @@ export class ConsolWeb {
       clear: () => {
         if (loopInterval !== null) {
           clearInterval(loopInterval);
+          loopInterval = null;
         }
         this.removeLine(index);
+        this.render();
+      },
+      stopLoop: () => {
+        if (loopInterval !== null) {
+          clearInterval(loopInterval);
+          loopInterval = null;
+        }
+      },
+      startLoop: () => {
+        if (loopInterval === null) {
+          createLoop();
+        }
       },
     };
   }
