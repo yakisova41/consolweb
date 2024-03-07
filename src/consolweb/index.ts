@@ -140,17 +140,17 @@ export class ConsolWeb {
       const currentBarLength = Math.round(barLength * currentBarP);
 
       const percent = conf.showPercent
-        ? `${Math.floor(currentBarP * 100)}%`
+        ? `${Math.floor(currentBarP * 100)}% `
         : "";
-      const length = conf.showLength ? `${current}/${max}` : "";
-      const beforeText = conf.beforeText ? conf.beforeText : "";
+      const length = conf.showLength ? `[${current}/${max}] ` : "";
+      const beforeText = conf.beforeText ? `${conf.beforeText} ` : "";
       const afterText = conf.afterText ? conf.afterText : "";
 
       const bar =
         currentBar.repeat(currentBarLength) +
         backgroundBar.repeat(barLength - currentBarLength);
 
-      return `${beforeText} [${length}] ${percent} ${bar} ${afterText}`;
+      return `${beforeText}${length}${percent}${bar} ${afterText}`;
     };
 
     output = createBar(current, max);
