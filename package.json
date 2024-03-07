@@ -3,9 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "main": "dist",
-  "types": "dist",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
+  "files": ["dist"],
   "scripts": {
     "dev": "vite",
     "build:demopage": "tsc && vite build",
