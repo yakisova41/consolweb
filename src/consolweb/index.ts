@@ -3,7 +3,7 @@ export class ConsolWeb {
   private lines: LineData[] = [];
 
   constructor(config: ConsolWebConf = {}) {
-    this.console = window.console;
+    this.console = config.console !== undefined ? config.console : window.console;
 
     if (config.bindNative) {
       this.bind_native();
@@ -214,6 +214,7 @@ export class ConsolWeb {
 export interface ConsolWebConf {
   bindNative?: boolean;
   setGlobalThis?: boolean;
+  console?: Console
 }
 
 export interface LineData {
