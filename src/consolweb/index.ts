@@ -3,7 +3,8 @@ export class ConsolWeb {
   private lines: LineData[] = [];
 
   constructor(config: ConsolWebConf = {}) {
-    this.console = config.console !== undefined ? config.console : window.console;
+    this.console =
+      config.console !== undefined ? config.console : window.console;
 
     if (config.bindNative) {
       this.bind_native();
@@ -159,7 +160,7 @@ export class ConsolWeb {
     const createLoop = () => {
       const frames = ["-", "\\", "|", "/"];
       let i = 0;
-      loopInterval = window.setInterval(() => {
+      loopInterval = setInterval(() => {
         this.replaceLine(index, this.console.log, frames[i] + " " + output);
 
         if (i !== 3) {
@@ -214,7 +215,7 @@ export class ConsolWeb {
 export interface ConsolWebConf {
   bindNative?: boolean;
   setGlobalThis?: boolean;
-  console?: Console
+  console?: Console;
 }
 
 export interface LineData {

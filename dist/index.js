@@ -12,7 +12,8 @@ class ConsolWeb {
             writable: true,
             value: []
         });
-        this.console = config.console !== undefined ? config.console : window.console;
+        this.console =
+            config.console !== undefined ? config.console : window.console;
         if (config.bindNative) {
             this.bind_native();
         }
@@ -125,7 +126,7 @@ class ConsolWeb {
         const createLoop = () => {
             const frames = ["-", "\\", "|", "/"];
             let i = 0;
-            loopInterval = window.setInterval(() => {
+            loopInterval = setInterval(() => {
                 this.replaceLine(index, this.console.log, frames[i] + " " + output);
                 if (i !== 3) {
                     i++;
