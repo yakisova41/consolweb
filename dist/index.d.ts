@@ -1,14 +1,13 @@
 declare class ConsolWeb {
     private console;
     private lines;
-    private belowLines;
     constructor(config?: ConsolWebConf);
     private bind_native;
     render(): void;
     clear(): void;
-    pushLine(callback: LineData["callback"], below: boolean, ...data: LineData["data"]): number;
-    replaceLine(index: number, callback: LineData["callback"], below: boolean, ...data: LineData["data"]): number;
-    removeLine(index: number, below: boolean): number;
+    pushLine(callback: LineData["callback"], ...data: LineData["data"]): number;
+    replaceLine(index: number, callback: LineData["callback"], ...data: LineData["data"]): number;
+    removeLine(index: number): number;
     log(...data: LineData["data"]): {
         clear: () => void;
         replace: (...data: LineData["data"]) => void;
@@ -29,15 +28,17 @@ declare class ConsolWeb {
         beforeText?: string;
         afterText?: string;
         loop?: boolean;
-        alwaysBelow?: boolean;
     }): {
         update: (updateCurrent: number) => void;
         clear: () => void;
+        stopLoop: () => void;
+        startLoop: () => void;
     };
 }
 interface ConsolWebConf {
     bindNative?: boolean;
     setGlobalThis?: boolean;
+    console?: Console;
 }
 interface LineData {
     callback: typeof console.log | typeof console.error | typeof console.warn;

@@ -12,13 +12,7 @@ class ConsolWeb {
             writable: true,
             value: []
         });
-        Object.defineProperty(this, "belowLines", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: []
-        });
-        this.console = window.console;
+        this.console = config.console !== undefined ? config.console : window.console;
         if (config.bindNative) {
             this.bind_native();
         }
@@ -47,66 +41,65 @@ class ConsolWeb {
         this.lines.forEach((lineData) => {
             lineData.callback(...lineData.data);
         });
-        this.belowLines.forEach((lineData) => {
-            lineData.callback(...lineData.data);
-        });
     }
     clear() {
         this.lines = [];
-        this.belowLines = [];
         this.render();
     }
-    pushLine(callback, below, ...data) {
-        (below ? this.belowLines : this.lines).push({
+    pushLine(callback, ...data) {
+        this.lines.push({
             callback,
             data,
         });
         return this.lines.length - 1;
     }
-    replaceLine(index, callback, below, ...data) {
-        (below ? this.belowLines : this.lines).splice(index, 1, {
+    replaceLine(index, callback, ...data) {
+        this.lines.splice(index, 1, {
             callback,
             data,
         });
         return index;
     }
-    removeLine(index, below) {
-        (below ? this.belowLines : this.lines).splice(index, 1);
+    removeLine(index) {
+        this.lines.splice(index, 1);
         return index;
     }
     log(...data) {
-        const index = this.pushLine(this.console.log, false, ...data);
+        const index = this.pushLine(this.console.log, ...data);
         this.render();
         return {
             clear: () => {
-                this.removeLine(index, false);
+                this.removeLine(index);
+                this.render();
             },
             replace: (...data) => {
-                this.replaceLine(index, this.console.log, false, ...data);
+                this.replaceLine(index, this.console.log, ...data);
             },
         };
     }
     warn(...data) {
-        const index = this.pushLine(this.console.warn, false, ...data);
+        const index = this.pushLine(this.console.warn, ...data);
         this.render();
         return {
             clear: () => {
-                this.removeLine(index, false);
+                this.removeLine(index);
+                this.render();
             },
             replace: (...data) => {
-                this.replaceLine(index, this.console.warn, false, ...data);
+                this.replaceLine(index, this.console.warn, ...data);
             },
         };
     }
     error(...data) {
-        const index = this.pushLine(this.console.error, false, ...data);
+        const index = this.pushLine(this.console.error, ...data);
         this.render();
         return {
             clear: () => {
-                this.removeLine(index, false);
+                this.removeLine(index);
+                this.render();
             },
             replace: (...data) => {
-                this.replaceLine(index, this.console.error, false, ...data);
+                this.replaceLine(index, this.console.error, ...data);
             },
         };
     }
@@ -115,29 +108,25 @@ class ConsolWeb {
         let loopInterval = null;
         const backgroundBar = conf.backgroundBar !== undefined ? conf.backgroundBar : "_";
         const currentBar = conf.currentBar !== undefined ? conf.currentBar : "#";
-        const below = conf.alwaysBelow ? true : false;
         const createBar = (current, max) => {
             const barLength = 20;
             const currentBarP = current / max;
             const currentBarLength = Math.round(barLength * currentBarP);
             const percent = conf.showPercent
-                ? `${Math.floor(currentBarP * 100)}%`
+                ? `${Math.floor(currentBarP * 100)}% `
                 : "";
-            const length = conf.showLength ? `${current}/${max}` : "";
-            const beforeText = conf.beforeText ? conf.beforeText : "";
+            const length = conf.showLength ? `[${current}/${max}] ` : "";
+            const beforeText = conf.beforeText ? `${conf.beforeText} ` : "";
             const afterText = conf.afterText ? conf.afterText : "";
             const bar = currentBar.repeat(currentBarLength) +
                 backgroundBar.repeat(barLength - currentBarLength);
-            return `${beforeText} [${length}] ${percent} ${bar} ${afterText}`;
+            return `${beforeText}${length}${percent}${bar} ${afterText}`;
         };
-        output = createBar(current, max);
-        const index = this.pushLine(this.console.log, below, output);
-        this.render();
-        if (conf.loop) {
+        const createLoop = () => {
             const frames = ["-", "\\", "|", "/"];
             let i = 0;
             loopInterval = window.setInterval(() => {
-                this.replaceLine(index, this.console.log, below, frames[i] + " " + output);
+                this.replaceLine(index, this.console.log, frames[i] + " " + output);
                 if (i !== 3) {
                     i++;
                 }
@@ -146,11 +135,17 @@ class ConsolWeb {
                 }
                 this.render();
             }, 200);
+        };
+        output = createBar(current, max);
+        const index = this.pushLine(this.console.log, output);
+        this.render();
+        if (conf.loop) {
+            createLoop();
         }
         return {
             update: (updateCurrent) => {
                 output = createBar(updateCurrent, max);
-                this.replaceLine(index, this.console.log, below, output);
+                this.replaceLine(index, this.console.log, output);
                 if (!conf.loop) {
                     this.render();
                 }
@@ -158,8 +153,21 @@ class ConsolWeb {
             clear: () => {
                 if (loopInterval !== null) {
                     clearInterval(loopInterval);
+                    loopInterval = null;
                 }
-                this.removeLine(index, below);
+                this.removeLine(index);
+                this.render();
+            },
+            stopLoop: () => {
+                if (loopInterval !== null) {
+                    clearInterval(loopInterval);
+                    loopInterval = null;
+                }
+            },
+            startLoop: () => {
+                if (loopInterval === null) {
+                    createLoop();
+                }
             },
         };
     }
